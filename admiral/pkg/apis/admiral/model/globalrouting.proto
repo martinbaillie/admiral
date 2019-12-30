@@ -37,22 +37,25 @@ option go_package = "model";
 // ```
 
 message GlobalTrafficPolicy {
-    // REQUIRED: A list host name .
-    repeated TrafficPolicy policy = 1;
+    // OPTIONAL: A list host name .
+    repeated LocalityTrafficPolicy trafficPolicy = 1;
+
+    //OPTIONAL: defines traffic percentages to be sent to different label-based segments
+    repeated SegmentRoutingPolicy segmentPolicy = 2;
+
+    // REQUIRED: dns that can be used by client.  This name will have the
+    // traffic type applied to it
+    string host = 3;
 
     // REQUIRED: One or more labels that indicate a specific set of pods/VMs
     // on which this global routing policy should be applied. The scope of
     // label search is restricted to namespace mark for mesh enablement
     // this will scan all cluster and namespace
-    map<string, string> selector = 2;
+    map<string, string> selector = 4;
 }
 
 // TrafficPolicy describes routing for a hostname.
-message TrafficPolicy {
-
-    // REQUIRED: dns that can be used by client.  This name will have the
-    // traffic type applied to it
-    string dns = 1;
+message LocalityTrafficPolicy {
 
     // REQUIRED: type of global load distrubtion
     LbType lbType = 2;
@@ -70,6 +73,17 @@ message TrafficPolicy {
 
     //weigth of primary and secondary must each 100
     repeated TrafficGroup target = 3;
+}
+
+//describes label-based routing
+message SegmentRoutingPolicy {
+    repeated SegmentGroup segments = 1;
+}
+
+message SegmentGroup {
+    string segment = 1;
+
+    float weight = 2;
 }
 
 message TrafficGroup {
